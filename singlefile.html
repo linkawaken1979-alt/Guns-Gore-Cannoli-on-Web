@@ -59,19 +59,16 @@ function unityShowBanner(msg, type) {
 
 async function loadParts(extension, count, progressStart, progressEnd) {
   const chunks = [];
-  let totalSize = 0;
 
   for (let i = 0; i < count; i++) {
-    const partName = `${prefix}.${extension}.part${String(i).padStart(3, "0")}`;
+    const partName = `${prefix}.${extension}.${String(i).padStart(3, "0")}`;
     const response = await fetch(`${buildUrl}/${partName}`);
 
     if (!response.ok) {
       throw new Error(`Failed to load ${partName}: HTTP ${response.status}`);
     }
 
-    const chunk = await response.arrayBuffer();
-    chunks.push(chunk);
-    totalSize += chunk.byteLength;
+    chunks.push(await response.arrayBuffer());
 
     const progress = (i + 1) / count;
     progressBarFull.style.width =
@@ -98,7 +95,7 @@ async function startGame() {
   try {
     const [dataBlob, wasmBlob, frameworkUrl, loaderUrl] = await Promise.all([
       loadParts("data", 16, 0, 40),
-      loadParts("wasm", 2, 40, 80),
+      loadParts("wasm", 4, 40, 80),
       jsBlobUrl(`${buildUrl}/${prefix}.framework.js`),
       jsBlobUrl(`${buildUrl}/${prefix}.loader.js`)
     ]);
